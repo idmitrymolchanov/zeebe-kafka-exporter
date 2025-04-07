@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <name>Zeebe Kafka Exporter Root</name>
+  <artifactId>zeebe-kafka-exporter-root</artifactId>
+  <groupId>io.zeebe</groupId>
+  <packaging>pom</packaging>
+  <version>3.1.2-SNAPSHOT</version>
+  <inceptionYear>2019</inceptionYear>
+  <url>https://github.com/zeebe-io/zeebe-kafka-exporter</url>
+
+  <modules>
+    <module>exporter</module>
+    <module>serde</module>
+  </modules>
+
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>3.9.1</version>
+    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
+    <relativePath />
+  </parent>
+
+  <properties>
+    <!-- release parent settings -->
+    <version.java>11</version.java>
+    <nexus.snapshot.repository>
+      https://artifacts.camunda.com/artifactory/zeebe-io-snapshots/
+    </nexus.snapshot.repository>
+    <nexus.release.repository>https://artifacts.camunda.com/artifactory/zeebe-io/
+    </nexus.release.repository>
+
+    <!-- license header -->
+    <license.header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</license.header>
+
+    <!-- project dependencies -->
+    <version.agrona>1.17.1</version.agrona>
+    <version.apiguardian>1.1.2</version.apiguardian>
+    <version.assertj>3.23.1</version.assertj>
+    <version.awaitility>4.2.0</version.awaitility>
+    <version.checkstyle>10.3.4</version.checkstyle>
+    <version.jackson>2.13.4</version.jackson>
+    <version.junit-jupiter>5.9.1</version.junit-jupiter>
+    <version.kafka>3.3.0</version.kafka>
+    <version.mockito>4.8.0</version.mockito>
+    <version.mockito-jupiter>3.9.0</version.mockito-jupiter>
+    <version.revapi>0.27.0</version.revapi>
+    <version.slf4j>1.7.36</version.slf4j>
+    <version.spotbugs>4.2.0</version.spotbugs>
+    <version.testcontainers>1.17.4</version.testcontainers>
+    <version.zeebe>1.3.6</version.zeebe>
+    <version.zeebe-test-container>3.5.2</version.zeebe-test-container>
+
+    <!-- plugin version -->
+    <plugin.version.animal-sniffer>1.22</plugin.version.animal-sniffer>
+    <plugin.version.assembly>3.4.2</plugin.version.assembly>
+    <plugin.version.compiler>3.10.1</plugin.version.compiler>
+    <plugin.version.checkstyle>3.2.0</plugin.version.checkstyle>
+    <plugin.version.clean>3.2.0</plugin.version.clean>
+    <plugin.version.dependency-analyzer>1.11.1</plugin.version.dependency-analyzer>
+    <plugin.version.dependency>3.1.2</plugin.version.dependency>
+    <plugin.version.enforcer>3.1.0</plugin.version.enforcer>
+    <plugin.version.failsafe>3.0.0-M7</plugin.version.failsafe>
+    <plugin.version.fmt>2.13</plugin.version.fmt>
+    <plugin.version.gpg>3.0.1</plugin.version.gpg>
+    <plugin.version.javadoc>3.4.1</plugin.version.javadoc>
+    <plugin.version.license>4.1</plugin.version.license>
+    <plugin.version.protobuf>0.6.1</plugin.version.protobuf>
+    <plugin.version.proto-compat>1.0.6</plugin.version.proto-compat>
+    <plugin.version.revapi>0.14.7</plugin.version.revapi>
+    <plugin.version.surefire>3.0.0-M7</plugin.version.surefire>
+
+    <!-- maven extensions -->
+    <extension.version.os-maven-plugin>1.6.1</extension.version.os-maven-plugin>
+
+    <!--
+      you can use the following to disable specific checks. the approach taken is to use a single
+      new property, skipChecks, which is the default value for pre-defined properties such as
+      checkstyle.skip. that way, you can use skipChecks, but you can also still use checkstyle.skip
+      if you only want to disable checkstyle
+      -->
+    <skipChecks>true</skipChecks>
+    <checkstyle.skip>true</checkstyle.skip>
+    <dependency-check.skip>true</dependency-check.skip>
+    <enforcer.skip>true</enforcer.skip>
+    <mdep.analyze.skip>true</mdep.analyze.skip>
+    <revapi.skip>true</revapi.skip>
+    <spotless.check.skip>true</spotless.check.skip>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Sibling modules -->
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-kafka-exporter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-kafka-exporter-serde</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Zeebe -->
+      <dependency>
+        <groupId>io.camunda</groupId>
+        <artifactId>zeebe-bom</artifactId>
+        <version>${version.zeebe}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <!-- Integration testing via Docker -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${version.testcontainers}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-test-container</artifactId>
+        <version>${version.zeebe-test-container}</version>
+      </dependency>
+
+      <!-- Unit test engine -->
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${version.junit-jupiter}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <!-- Serialization -->
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${version.jackson}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <!-- API compatibility specification -->
+      <dependency>
+        <groupId>org.apiguardian</groupId>
+        <artifactId>apiguardian-api</artifactId>
+        <version>${version.apiguardian}</version>
+      </dependency>
+
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+
+      <!-- Data structures -->
+      <dependency>
+        <groupId>org.agrona</groupId>
+        <artifactId>agrona</artifactId>
+        <version>${version.agrona}</version>
+      </dependency>
+
+      <!-- Kafka -->
+      <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka-clients</artifactId>
+        <version>${version.kafka}</version>
+      </dependency>
+
+      <!-- Test assertions -->
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+      </dependency>
+
+      <!-- Mocking -->
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${version.mockito}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${version.mockito}</version>
+      </dependency>
+
+      <!-- Timed assertions, asynchronous testing helpers -->
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>${version.awaitility}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- compiler -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${plugin.version.compiler}</version>
+        </plugin>
+
+        <!-- JAVADOC -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${plugin.version.javadoc}</version>
+          <configuration>
+            <source>${version.java}</source>
+          </configuration>
+        </plugin>
+
+        <!-- LICENSE PLUGIN -->
+<!--        <plugin>-->
+<!--          <groupId>com.mycila</groupId>-->
+<!--          <artifactId>license-maven-plugin</artifactId>-->
+<!--          <version>${plugin.version.license}</version>-->
+<!--          <configuration>-->
+<!--            <header>${license.header}</header>-->
+<!--            <properties>-->
+<!--              <owner>camunda services GmbH</owner>-->
+<!--              <email>info@camunda.com</email>-->
+<!--            </properties>-->
+<!--            <includes>-->
+<!--              <include>**/*.java</include>-->
+<!--            </includes>-->
+<!--            <mapping>-->
+<!--              <java>SLASHSTAR_STYLE</java>-->
+<!--            </mapping>-->
+<!--          </configuration>-->
+<!--          <executions>-->
+<!--            <execution>-->
+<!--              <id>add-license</id>-->
+<!--              <phase>compile</phase>-->
+<!--              <goals>-->
+<!--                <goal>format</goal>-->
+<!--              </goals>-->
+<!--            </execution>-->
+<!--          </executions>-->
+<!--        </plugin>-->
+
+        <!-- CHECKSTYLE -->
+<!--        <plugin>-->
+<!--          <groupId>org.apache.maven.plugins</groupId>-->
+<!--          <artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--          <version>${plugin.version.checkstyle}</version>-->
+<!--          &lt;!&ndash; dependency on build tool to reference the checkstyle cfg &ndash;&gt;-->
+<!--          <dependencies>-->
+<!--            <dependency>-->
+<!--              <groupId>io.camunda</groupId>-->
+<!--              <artifactId>zeebe-build-tools</artifactId>-->
+<!--              <version>${version.zeebe}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--              <groupId>com.puppycrawl.tools</groupId>-->
+<!--              <artifactId>checkstyle</artifactId>-->
+<!--              <version>${version.checkstyle}</version>-->
+<!--            </dependency>-->
+<!--          </dependencies>-->
+<!--          <configuration>-->
+<!--            <configLocation>check/.checkstyle.xml</configLocation>-->
+<!--            <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+<!--            <encoding>UTF-8</encoding>-->
+<!--            <failOnViolation>true</failOnViolation>-->
+<!--            <sourceDirectories>-->
+<!--              <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>-->
+<!--              <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>-->
+<!--            </sourceDirectories>-->
+<!--          </configuration>-->
+<!--          <executions>-->
+<!--            <execution>-->
+<!--              <id>validate-java</id>-->
+<!--              <phase>validate</phase>-->
+<!--              <goals>-->
+<!--                <goal>check</goal>-->
+<!--              </goals>-->
+<!--              <configuration>-->
+<!--              </configuration>-->
+<!--            </execution>-->
+<!--          </executions>-->
+<!--        </plugin>-->
+
+        <!-- unit tests -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${plugin.version.surefire}</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <trimStackTrace>false</trimStackTrace>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <properties>
+              <configurationParameters>
+                junit.jupiter.execution.parallel.enabled = true
+                junit.jupiter.execution.parallel.mode.default = same_thread
+                junit.jupiter.execution.parallel.config.strategy = dynamic
+                junit.jupiter.execution.parallel.config.dynamic.factor = 2
+              </configurationParameters>
+            </properties>
+          </configuration>
+        </plugin>
+
+        <!-- integration tests -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${plugin.version.failsafe}</version>
+          <configuration>
+            <failIfNoTests>false</failIfNoTests>
+            <trimStackTrace>false</trimStackTrace>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <properties>
+              <configurationParameters>
+                junit.jupiter.execution.parallel.enabled = true
+                junit.jupiter.execution.parallel.mode.default = same_thread
+                junit.jupiter.execution.parallel.config.strategy = dynamic
+                junit.jupiter.execution.parallel.config.dynamic.factor = 2
+              </configurationParameters>
+            </properties>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Google code format plugin -->
+<!--        <plugin>-->
+<!--          <groupId>com.coveo</groupId>-->
+<!--          <artifactId>fmt-maven-plugin</artifactId>-->
+<!--          <version>${plugin.version.fmt}</version>-->
+<!--          <executions>-->
+<!--            <execution>-->
+<!--              <goals>-->
+<!--                <goal>format</goal>-->
+<!--              </goals>-->
+<!--            </execution>-->
+<!--          </executions>-->
+<!--        </plugin>-->
+
+        <!-- jar with dependency assembly -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${plugin.version.assembly}</version>
+        </plugin>
+
+        <!-- enforce unique dependencies and convergence -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${plugin.version.enforcer}</version>
+          <executions>
+            <execution>
+              <id>enforce-dependency-convergence</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <!-- see more https://maven.apache.org/enforcer/enforcer-rules/index.html -->
+                <rules>
+                  <banDuplicatePomDependencyVersions />
+                  <requireJavaVersion>
+                    <version>[11,)</version>
+                  </requireJavaVersion>
+                  <requireMavenVersion>
+                    <version>[3.6,)</version>
+                  </requireMavenVersion>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- find unused dependencies -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${plugin.version.dependency}</version>
+          <!-- To run with Java 11 - https://issues.apache.org/jira/browse/MDEP-613-->
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.shared</groupId>
+              <artifactId>maven-dependency-analyzer</artifactId>
+              <version>${plugin.version.dependency-analyzer}</version>
+            </dependency>
+          </dependencies>
+
+          <executions>
+            <execution>
+              <id>analyze-dependencies</id>
+              <goals>
+                <goal>analyze-only</goal>
+              </goals>
+              <!-- The analyze-only goal assumes that the test-compile phase has been executed -->
+              <phase>verify</phase>
+              <configuration>
+                <failOnWarning>true</failOnWarning>
+                <outputXML>true</outputXML>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- enforce version of clean plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${plugin.version.clean}</version>
+        </plugin>
+
+        <!-- compatibility checks/guard -->
+        <plugin>
+          <groupId>org.revapi</groupId>
+          <artifactId>revapi-maven-plugin</artifactId>
+          <version>${plugin.version.revapi}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.revapi</groupId>
+              <artifactId>revapi-java</artifactId>
+              <version>${version.revapi}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <phase>verify</phase>
+              <id>check</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <checkDependencies>true</checkDependencies>
+            <expandProperties>true</expandProperties>
+            <failOnMissingConfigurationFiles>true</failOnMissingConfigurationFiles>
+            <analysisConfigurationFiles combine.children="append">
+              <configurationFile>
+                <path>${maven.multiModuleProjectDirectory}/revapi.json</path>
+              </configurationFile>
+            </analysisConfigurationFiles>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>animal-sniffer-maven-plugin</artifactId>
+          <version>${plugin.version.animal-sniffer}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <!-- default plugins to execute in all projects -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>com.coveo</groupId>
+        <artifactId>fmt-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>community-action-maven-release</id>
+      <properties>
+        <skipChecks>true</skipChecks>
+        <performRelease>true</performRelease>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${plugin.version.gpg}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Prevent gpg from using pinentry programs -->
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      development profile is on by default, but disabled during release
+     -->
+    <profile>
+      <id>development</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>!true</value>
+        </property>
+      </activation>
+
+      <modules>
+        <module>qa</module>
+      </modules>
+    </profile>
+  </profiles>
+
+  <repositories>
+    <repository>
+      <id>zeebe</id>
+      <name>Zeebe Repository</name>
+      <url>https://artifacts.camunda.com/artifactory/zeebe-io/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>zeebe-snapshots</id>
+      <name>Zeebe Snapshot Repository</name>
+      <url>https://artifacts.camunda.com/artifactory/zeebe-io-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <scm>
+    <url>https://github.com/camunda-community-hub/zeebe-kafka-exporter</url>
+    <connection>scm:git:git@github.com:camunda-community-hub/zeebe-kafka-exporter.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda-community-hub/zeebe-kafka-exporter.git
+    </developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+</project>

@@ -1,0 +1,67 @@
+[
+  {
+    "extension": "revapi.java",
+    "configuration": {
+      "reportUsesFor": "all-differences",
+      "missing-classes": {
+        "behavior": "ignore",
+        "ignoreMissingAnnotations": true
+      },
+      "matchOverloads": false
+    }
+  },
+  {
+    "extension": "revapi.versions",
+    "configuration": {
+      "enabled": true,
+      "passThroughDifferences": [
+        "java.class.nonPublicPartOfAPI"
+      ],
+      "versionIncreaseAllows": {
+        "major": {
+          "severity": "BREAKING"
+        },
+        "minor": {
+          "classification": {
+            "BINARY": "NON_BREAKING",
+            "SOURCE": "BREAKING",
+            "SEMANTIC": "BREAKING",
+            "OTHER": "BREAKING"
+          }
+        },
+        "patch": {
+          "classification": {
+            "BINARY": "NON_BREAKING",
+            "SOURCE": "BREAKING",
+            "SEMANTIC": "BREAKING",
+            "OTHER": "BREAKING"
+          }
+        }
+      }
+    }
+  },
+  {
+    "extension": "revapi.filter",
+    "justification": "Ignore everything not included in the module itself",
+    "configuration": {
+      "archives": {
+        "include": [
+          "io\\.zeebe:zeebe-kafka-exporter:.*"
+        ]
+      },
+      "exclude": [
+        {
+          "matcher": "java",
+          "match": "@org.apiguardian.api.API(status != org.apiguardian.api.API.Status.STABLE) ^*;"
+        }
+      ]
+    }
+  },
+  {
+    "extension": "revapi.differences",
+    "id": "intentional-api-changes",
+    "configuration": {
+      "differences": []
+    }
+  }
+]
