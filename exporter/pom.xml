@@ -95,7 +95,7 @@
     <dependency>
       <groupId>io.camunda.spring</groupId>
       <artifactId>spring-boot-starter-camunda</artifactId>
-      <version>8.5.3</version>
+      <version>8.5.18</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/io.camunda/zeebe-bpmn-model -->
     <dependency>
